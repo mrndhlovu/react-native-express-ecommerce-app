@@ -2,7 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
 
-import { ROOT_URL } from "../config";
+import { ROOT_URL } from "../utils/config";
 
 const BUILD_DIR = __dirname;
 

@@ -1,12 +1,12 @@
-const { TOKEN_SIGNATURE } = require("../utils/config");
 const bcrypt = require("bcrypt");
-const Board = require("./Board");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const isEmail = require("validator/lib/isEmail");
+
+const { TOKEN_SIGNATURE } = require("../utils/config");
 const {
   sendPasswordChangeConfirmation,
-} = require("../utils/middleware/emailMiddleware");
+} = require("../middleware/emailMiddleware");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -37,7 +37,7 @@ const UserSchema = new mongoose.Schema(
       minlength: 7,
       validate(value) {
         if (value.toLowerCase().includes("password"))
-          throw new Error(`Password should not include 'password'`);
+          throw new Error("Password should not include 'password'");
       },
     },
     starred: {
@@ -151,7 +151,7 @@ UserSchema.methods.getAuthToken = async function () {
 };
 
 UserSchema.statics.findByCredentials = async (email, password, token) => {
-  const user = await User.findOne({ email });
+  const user = await UserSchema.findOne({ email });
   let isMatch;
   if (!user) throw new Error("Login error: check your email or password.");
   if (password) {
@@ -166,27 +166,21 @@ UserSchema.statics.findByCredentials = async (email, password, token) => {
 };
 
 UserSchema.pre("save", function (next) {
-  var user = this;
-  var SALT_FACTOR = 12;
+  const user = this;
+  const SALT_FACTOR = 12;
 
   if (!user.isModified("password")) return next();
 
-  bcrypt.genSalt(SALT_FACTOR, function (err, salt) {
+  bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
     if (err) return next(err);
 
-    bcrypt.hash(user.password, salt, function (err, hash) {
-      if (err) return next(err);
+    bcrypt.hash(user.password, salt, (error, hash) => {
+      if (err) return next(error);
       user.password = hash;
       sendPasswordChangeConfirmation(user.email, user.fname);
       next();
     });
   });
-});
-
-UserSchema.pre("remove", async function (next) {
-  const user = this;
-  await Board.deleteMany({ owner: user._id });
-  next();
 });
 
 const User = mongoose.model("User", UserSchema);

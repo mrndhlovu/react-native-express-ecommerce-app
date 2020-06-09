@@ -5,10 +5,10 @@ import passport from "passport";
 import log from "./utils/console-alert";
 import { PORT } from "./utils/config";
 
-import { routesConfig } from "./utils/middleware/routesMiddleware";
-import mongooseDBConfig from "./utils/middleware/mongooseDBMiddleware";
-import passportConfig from "./utils/middleware/passportMiddleware";
-import serverConfig from "./utils/middleware/serverConfigMiddleware";
+import routesConfig from "./config/routesConfig";
+import mongooseDBConfig from "./config/mongooseDBConfig";
+import passportConfig from "./config/passportConfig";
+import serverConfig from "./config/serverConfig";
 
 mongooseDBConfig();
 passportConfig(passport);

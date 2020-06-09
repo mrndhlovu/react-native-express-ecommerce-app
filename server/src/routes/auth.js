@@ -1,19 +1,16 @@
-const { ROOT_URL, allowedFields } = require("../utils/config.js");
-const auth = require("../utils/middleware/authMiddleware").authMiddleware;
 const router = require("express").Router();
+const crypto = require("crypto");
+const async = require("async");
+const passport = require("passport");
+
 const User = require("../models/User");
 const {
   sendWelcomeEmail,
   sendResetPasswordEmail,
   sendPasswordChangeConfirmation,
-} = require("../utils/middleware/emailMiddleware");
-const {
-  viewedRecentMiddleware,
-} = require("../utils/middleware/boardMiddleWare");
-const crypto = require("crypto");
-const async = require("async");
-const passport = require("passport");
-const Notification = require("../models/Notification");
+} = require("../middleware/emailMiddleware");
+const auth = require("../middleware/authMiddleware").authMiddleware;
+const { ROOT_URL } = require("../utils/config.js");
 
 const generateAccessCookie = async (res, token) => {
   res.setHeader("Access-Control-Allow-Origin", ROOT_URL);
@@ -28,10 +25,10 @@ router.post("/signup", async (req, res) => {
   const user = new User(req.body);
   try {
     const token = await user.getAuthToken();
-    const notification = new Notification({
+    const notification = {
       subject: "Welcome to Task Monitor!",
       description: `Welcome to Task monitor ${user.fname}. Hope you enjoy using it!`,
-    });
+    };
     user.notifications.push(notification);
 
     sendWelcomeEmail(user.email, notification);
@@ -91,7 +88,7 @@ router.post("/recovery", (req, res) => {
       },
       (user, done) => {
         crypto.randomBytes(20, (err, buffer) => {
-          var token = buffer.toString("hex");
+          const token = buffer.toString("hex");
           done(err, user, token);
         });
       },
@@ -117,12 +114,13 @@ router.post("/recovery", (req, res) => {
 
         const mailSent = sendResetPasswordEmail(emailConfig);
 
-        if (mailSent)
+        if (mailSent) {
           return res.json({
             success: true,
             message: `Link to reset your password was sent to ${user.email} with further instructions.`,
           });
-        else return done();
+        }
+        return done();
       },
     ],
     (err) => res.status(422).json({ message: err })
@@ -139,22 +137,24 @@ router.post("/:token/update-password", (req, res) => {
       resetPasswordExpires: { $gt: Date.now() },
     },
     async (err, user) => {
-      if (!user)
+      if (!user) {
         return res.status(400).send({
           message: "Password reset token is invalid or has expired.",
         });
-      if (password !== confirmPassword)
+      }
+      if (password !== confirmPassword) {
         return res.status(400).send({
           message: "Passwords do not match.",
         });
+      }
       user.password = confirmPassword;
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
 
-      const notification = new Notification({
+      const notification = {
         subject: `${user.fname}, your password has been changed.`,
         description: `${user.fname}, this is a confirmation that the password for your account ${user.email} has just been changed.`,
-      });
+      };
       user.notifications.push(notification);
 
       await user.save();
@@ -164,15 +164,15 @@ router.post("/:token/update-password", (req, res) => {
         notification
       );
 
-      if (mailSent)
+      if (mailSent) {
         return res.json({
           success: true,
           message: `Your password for account ${user.email} has been changed.`,
         });
-      else
-        return res.status(400).send({
-          error: "Unable to send confirmation for changing your password.",
-        });
+      }
+      return res.status(400).send({
+        error: "Unable to send confirmation for changing your password.",
+      });
     }
   );
 });
@@ -194,30 +194,6 @@ router.delete("/delete-account", auth, async (req, res) => {
     res.send({ message: "Account deleted" });
   } catch (error) {
     return res.status(400).send({ error: "Failed to delete account." });
-  }
-});
-
-router.patch("/update", auth, async (req, res, next) => {
-  const updates = Object.keys(req.body);
-  const updateBoardStar = updates[0] === "starred";
-
-  const isValidField = updates.every((update) =>
-    allowedFields.includes(update)
-  );
-
-  if (!isValidField)
-    return res.status(400).send({ error: "Invalid update field" });
-
-  try {
-    updates.forEach((update) => (req.user[update] = req.body[update]));
-    if (updateBoardStar) await viewedRecentMiddleware(req, res, next);
-    else await req.user.save();
-
-    res.send(req.user);
-  } catch (error) {
-    return res.status(400).send({
-      message: error.message,
-    });
   }
 });
 
