@@ -1,8 +1,8 @@
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import path from "path";
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const path = require("path");
 
-import { ROOT_URL } from "../utils/config";
+const { ROOT_URL } = require("../utils/config");
 
 const BUILD_DIR = __dirname;
 
@@ -20,4 +20,4 @@ const serverConfig = (app, express, passport) => {
   app.use(express.static(path.join(BUILD_DIR, "build")));
 };
 
-export default serverConfig;
+module.exports = serverConfig;

@@ -23,6 +23,7 @@ const generateAccessCookie = async (res, token) => {
 
 router.post("/signup", async (req, res) => {
   const user = new User(req.body);
+
   try {
     const token = await user.getAuthToken();
     const notification = {

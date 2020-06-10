@@ -1,5 +1,3 @@
-'use es6';
-
 import {
   INITIALIZE_AUTH,
   AUTH_FAIL,

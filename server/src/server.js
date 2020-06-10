@@ -1,14 +1,13 @@
-import express from "express";
-import http from "http";
-import passport from "passport";
+const express = require("express");
+const http = require("http");
+const passport = require("passport");
 
-import log from "./utils/console-alert";
-import { PORT } from "./utils/config";
-
-import routesConfig from "./config/routesConfig";
-import mongooseDBConfig from "./config/mongooseDBConfig";
-import passportConfig from "./config/passportConfig";
-import serverConfig from "./config/serverConfig";
+const { PORT } = require("./utils/config");
+const log = require("./utils/console-alert");
+const mongooseDBConfig = require("./config/mongooseDBConfig");
+const passportConfig = require("./config/passportConfig");
+const routesConfig = require("./config/routesConfig");
+const serverConfig = require("./config/serverConfig");
 
 mongooseDBConfig();
 passportConfig(passport);
@@ -19,5 +18,5 @@ const server = http.createServer(app);
 serverConfig(app, express, passport);
 
 routesConfig(app, express);
-server.listen(PORT, () => log.success(`Server running on port ${PORT}`));
+server.listen(PORT, () => log.success(`Server listening on port ${PORT}`));
 process.on("exit", () => log.warning("Server shutdown."));

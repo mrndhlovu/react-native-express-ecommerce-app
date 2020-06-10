@@ -2,14 +2,11 @@
   "name": "server",
   "version": "0.0.1",
   "private": true,
-  "main": "server.js",
-  "license": "MIT",
+  "main": "./src/server.js",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon dist/server.js",
-    "build:watch": "babel -watch --output-dir=dist ./src",
-    "clean": "rm -rf dist",
     "lint": "eslint src",
-    "lint:fix": "eslint --fix src"
+    "lint:fix": "eslint --fix src",
+    "start": "nodemon .src/server.js"
   },
   "dependencies": {
     "@sendgrid/mail": "^7.1.1",

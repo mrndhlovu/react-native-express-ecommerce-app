@@ -1,7 +1,7 @@
 export const getRootUrl = () =>
   process.env.NODE_ENV === 'production'
     ? 'http://elephant.herokuapp.com'
-    : 'http://localhost:3000';
+    : process.env['REACT_APP_CLIENT_URL'];
 
 export const AUTH_EP = `${getRootUrl()}/auth`;
 
