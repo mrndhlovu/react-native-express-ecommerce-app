@@ -1,13 +1,13 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const SpotifyStrategy = require("passport-spotify").Strategy;
-const User = require("../../models/User");
+const User = require("../models/User");
 
 const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   SPOTIFY_CLIENT_ID,
   SPOTIFY_SECRET_ID,
-} = require("../config");
+} = require("../utils/config");
 
 const passportInit = (passport) => {
   passport.serializeUser((user, done) => done(null, user.id));

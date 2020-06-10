@@ -37,7 +37,7 @@ const upload = multer({
       cb(
         null,
         file.originalname,
-        file.originalname + "-" + Date.now() + file.originalname
+        `${file.originalname}-${Date.now()}${file.originalname}`,
       );
     },
   }),

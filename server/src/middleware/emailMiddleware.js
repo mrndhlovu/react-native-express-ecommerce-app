@@ -1,6 +1,6 @@
 const sgMail = require("@sendgrid/mail");
-const { S_GRID_API_KEY } = require("../config");
 const moment = require("moment");
+const { S_GRID_API_KEY } = require("../utils/config");
 
 sgMail.setApiKey(S_GRID_API_KEY);
 
